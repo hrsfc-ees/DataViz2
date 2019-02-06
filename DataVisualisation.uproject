@@ -1,0 +1,16 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{00033B7B-08D6-6843-8739-352A5B26C732}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "DataVisualisation",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		}
+	]
+}
