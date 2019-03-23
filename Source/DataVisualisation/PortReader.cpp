@@ -127,6 +127,7 @@ TArray<float> PortReader::GetLine()
     std::string s;
     std::getline(SStream, s);
     FString out(s.c_str());
+    ThePC->ClientMessage(out);
     TArray<FString> OutArray;
     out.ParseIntoArray(OutArray, TEXT(","), true);
     FString ToPrint;
