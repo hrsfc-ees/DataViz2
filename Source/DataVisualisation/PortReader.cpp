@@ -13,7 +13,8 @@ PortReader* PortReader::Runnable = NULL;
 PortReader::PortReader(TQueue<TArray<float> >& TheQueue, APlayerController* InPC)
 :Queue(&TheQueue), ThePC(InPC), StopTaskCounter(0)
 {
-    Thread = FRunnableThread::Create(this, TEXT("PortReader"), 0, TPri_BelowNormal);
+    Thread = FRunnableThread::Create(this, TEXT("PortReader"), 0, TPri_Highest);
+    lastdata.Init(0,6);
 }
 
 PortReader::~PortReader()
@@ -38,8 +39,7 @@ bool PortReader::Init()
     addr->SetPort(12345);
     
     bool connected = ListenerSocket->Connect(*addr);
-    
-    SStream.rdbuf()->pubsetbuf(0,0);
+//    IStream.rdbuf()->pubsetbuf(0,0);
     
     
     Queue->Empty();
@@ -113,29 +113,50 @@ void PortReader::Shutdown()
 
 TArray<float> PortReader::GetLine()
 {
+    
     uint32 dataSize;
-    uint8 data[1024];
-    int32 read;
-    
+    FString out;
+    TArray<float> Returner;
+   // ThePC->ClientMessage("Deque:");
+    //ThePC->ClientMessage(FString::FromInt(Dataqueue.size()));
     if(ListenerSocket->HasPendingData(dataSize)){
-        ListenerSocket->Recv(data, 1024, read, ESocketReceiveFlags::None);
-        SStream.write((char*)data, read);
-    }
-    
-    
-    
-    std::string s;
-    std::getline(SStream, s);
-    FString out(s.c_str());
-    ThePC->ClientMessage(out);
+        ThePC->ClientMessage("Socket:");
+        ThePC->ClientMessage(FString::FromInt(dataSize));
+        TArray<uint8> data;
+        data.Init(0,FMath::Min(dataSize, 65507u));
+        int32 read;
+        ListenerSocket->Recv(data.GetData(), data.Num(), read, ESocketReceiveFlags::None);
+        out = StringFromBinaryArray(data);
+        ThePC->ClientMessage(out);
+        
+        
+//    TArray<FString> arr = ParsePort();
+//    if (arr.Num() < 1){Returner.Init(0,5); return Returner;}
+//    FString out = arr[arr.Num() - 1];
+    //ThePC->ClientMessage("Out:");
+    //ThePC->ClientMessage(out);
     TArray<FString> OutArray;
     out.ParseIntoArray(OutArray, TEXT(","), true);
-    FString ToPrint;
-    TArray<float> Returner;
     for (auto& Str : OutArray)
     {
         Returner.Add(FCString::Atof(*Str));
-        
     }
+    ThePC->ClientMessage("Using Default");
+    lastdata = Returner;
     return Returner;
+    } else {
+       return lastdata;
+    }
+    
+    
+}
+
+FString PortReader::StringFromBinaryArray(TArray<uint8> BinaryArray)
+{
+	BinaryArray.Add(0); // Add 0 termination. Even if the string is already 0-terminated, it doesn't change the results.
+	// Create a string from a byte array. The string is expected to be 0 terminated (i.e. a byte set to 0).
+	// Use UTF8_TO_TCHAR if needed.
+	// If you happen to know the data is UTF-16 (USC2) formatted, you do not need any conversion to begin with.
+	// Otherwise you might have to write your own conversion algorithm to convert between multilingual UTF-16 planes.
+	return FString(ANSI_TO_TCHAR(reinterpret_cast<const char*>(BinaryArray.GetData())));
 }

@@ -7,7 +7,8 @@
 #include "Networking.h"
 #include "UnrealString.h"
 #include <string>
-#include <sstream>
+#include <istream>
+#include <deque>
 
 
 /**
@@ -32,9 +33,10 @@ class PortReader : public FRunnable
 	FThreadSafeCounter StopTaskCounter;
     
     // String stream for data parsing
-    std::stringstream SStream;
-    
-    
+//    std::stringstream SStream;
+//    TCircularBuffer<uint8> Buf;
+//    std::deque <uint8> Dataqueue;
+//    
 public:
 	PortReader(TQueue<TArray<float> >& TheQueue, APlayerController* InPC);
 	~PortReader();
@@ -44,14 +46,15 @@ public:
 public:
 
     TArray<float> GetLine();
-    
+    FString StringFromBinaryArray(TArray<uint8> BinaryArray);
 	virtual bool Init();
 	virtual uint32 Run();
 	virtual void Stop();
 	// End FRunnable interface
-	
+//	TArray<FString> ParsePort();
 	/** Makes sure this thread has stopped properly */
 	void EnsureCompletion();
+    TArray<float> lastdata;
 	
 	
 	
