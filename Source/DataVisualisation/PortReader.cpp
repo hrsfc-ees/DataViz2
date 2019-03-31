@@ -131,10 +131,17 @@ TArray<float> PortReader::GetLine()
         
     TArray<FString> OutArray;
     out.ParseIntoArray(OutArray, TEXT(","), true);
-    for (auto& Str : OutArray)
-    {   
+    if(OutArray.Num() > 6){
+        return lastdata;
+    }
+    for (int i = 0; i < OutArray.Num(); i++) 
+    { 
+        float a = FCString::Atof(*(OutArray[i]));
+        if(a > 1){
+            a = lastdata[i];
+        }
         //Convert to float
-        Returner.Add(FCString::Atof(*Str));
+        Returner.Add(a);
     }
     //Ensure we always have data to send.
     lastdata = Returner;
