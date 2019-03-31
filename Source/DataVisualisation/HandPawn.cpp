@@ -47,7 +47,8 @@ void AHandPawn::BeginPlay()
 	Super::BeginPlay();
     PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
     PC->ClientMessage(TEXT("Starting Thread?"));
-    ReaderInst = PortReader::EasyInit(VoltageQueue, PC);
+    FIPv4Address ip(127,0,0,1);
+    ReaderInst = PortReader::EasyInit(VoltageQueue, PC, ip, 12345);
     
 	
 }
@@ -141,4 +142,15 @@ bool AHandPawn::GetVoltage(TArray<float>& VoltageArray)
 void AHandPawn::ClearQueue()
 {
     VoltageQueue.Empty();
+}
+
+
+void AHandPawn::RestartThread(int32 a, int32 b, int32 c, int32 d, int32 port){
+    if(ReaderInst){
+        ReaderInst->Shutdown();
+        PC->ClientMessage(TEXT("Restarting Thread?"));
+        FIPv4Address ip(a,b,c,d);
+        ReaderInst = PortReader::EasyInit(VoltageQueue, PC, ip, port);
+        PC->ClientMessage(FString::FromInt(port));
+    }
 }

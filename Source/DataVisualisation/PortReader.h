@@ -38,7 +38,7 @@ class PortReader : public FRunnable
 //    std::deque <uint8> Dataqueue;
 //    
 public:
-	PortReader(TQueue<TArray<float> >& TheQueue, APlayerController* InPC);
+	PortReader(TQueue<TArray<float> >& TheQueue, APlayerController* InPC, FIPv4Address ip, int32 port);
 	~PortReader();
     
     
@@ -48,6 +48,9 @@ public:
     //Get float from socket
     TArray<float> GetLine();
     
+    //Connection Data
+    FIPv4Address ip;
+    int32 port;
     //Convert uint8 array to Fstring
     FString StringFromBinaryArray(TArray<uint8> BinaryArray);
     
@@ -74,7 +77,7 @@ public:
         This code ensures only 1 instance will run at a time
 		This function returns a handle to the newly started instance.
 	*/
-	static PortReader* EasyInit(TQueue<TArray<float>>& TheQueue, APlayerController* InPC);
+	static PortReader* EasyInit(TQueue<TArray<float>>& TheQueue, APlayerController* InPC, FIPv4Address ip, int32 port);
 
 	/** Shuts down the thread. Static so it can easily be called from outside the thread context */
 	static void Shutdown();

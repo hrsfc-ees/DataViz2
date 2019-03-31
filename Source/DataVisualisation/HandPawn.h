@@ -8,6 +8,7 @@
 #include <fstream>
 #include <string>
 #include "PortReader.h"
+#include "Networking.h"
 #include "Kismet/GameplayStatics.h"
 #include "HandPawn.generated.h"
 
@@ -45,6 +46,12 @@ public:
     PortReader* ReaderInst = nullptr;
 
     APlayerController* PC = nullptr;
+    
+    
+    //Restarting Thread To Reconnect:
+    UFUNCTION(Exec)
+    void RestartThread(int32 a, int32 b, int32 c, int32 d, int32 port);
+    
     
     UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Voltage Array"), Category = "Serial", meta = (Keywords = "voltage port arduino serial start"))
     bool GetVoltage(TArray<float>& VoltageArray);

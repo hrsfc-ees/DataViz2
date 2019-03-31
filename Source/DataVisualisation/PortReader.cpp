@@ -10,8 +10,8 @@ PortReader* PortReader::Runnable = NULL;
 //***********************************************************
 
 
-PortReader::PortReader(TQueue<TArray<float> >& TheQueue, APlayerController* InPC)
-:Queue(&TheQueue), ThePC(InPC), StopTaskCounter(0)
+PortReader::PortReader(TQueue<TArray<float> >& TheQueue, APlayerController* InPC, FIPv4Address ip, int32 port)
+:Queue(&TheQueue), ThePC(InPC), StopTaskCounter(0), ip(ip), port(port)
 {
     Thread = FRunnableThread::Create(this, TEXT("PortReader"), 0, TPri_Highest);
     lastdata.Init(0,6);
@@ -31,12 +31,10 @@ bool PortReader::Init()
 {
     ListenerSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("Port Reader"), false);
     
-    
-    FIPv4Address ip(127, 0, 0, 1);
 
     TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
     addr->SetIp(ip.Value);
-    addr->SetPort(12345);
+    addr->SetPort(port);
     
     bool connected = ListenerSocket->Connect(*addr);
     
@@ -50,6 +48,7 @@ bool PortReader::Init()
             ThePC->ClientMessage("**********************************");
             ThePC->ClientMessage("Socket Opened!");
             ThePC->ClientMessage("**********************************");
+            ListenerSocket->SetLinger(true, 1);
         } else {
             ThePC->ClientMessage("Not connected");
         }
@@ -88,13 +87,13 @@ void PortReader::EnsureCompletion()
 	Thread->WaitForCompletion();
 }
 
-PortReader* PortReader::EasyInit(TQueue<TArray<float> >& TheQueue, APlayerController* InPC)
+PortReader* PortReader::EasyInit(TQueue<TArray<float> >& TheQueue, APlayerController* InPC, FIPv4Address ip, int32 port)
 {
     //Create new instance of thread if it does not exist
 	//		and the platform supports multi threading!
 	if (!Runnable && FPlatformProcess::SupportsMultithreading())
 	{
-		Runnable = new PortReader(TheQueue,InPC);			
+		Runnable = new PortReader(TheQueue,InPC, ip, port);			
 	}
 	return Runnable;
 }
@@ -141,7 +140,7 @@ TArray<float> PortReader::GetLine()
     lastdata = Returner;
     return Returner;
     } else {
-        ThePC->ClientMessage("Using Default");
+//        ThePC->ClientMessage("Using Default");
         return lastdata;
     }
     
