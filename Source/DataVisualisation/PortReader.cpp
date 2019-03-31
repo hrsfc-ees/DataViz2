@@ -39,8 +39,6 @@ bool PortReader::Init()
     addr->SetPort(12345);
     
     bool connected = ListenerSocket->Connect(*addr);
-//    IStream.rdbuf()->pubsetbuf(0,0);
-    
     
     Queue->Empty();
     if(ThePC) 
@@ -111,14 +109,15 @@ void PortReader::Shutdown()
 	}
 }
 
+
 TArray<float> PortReader::GetLine()
 {
     
     uint32 dataSize;
     FString out;
     TArray<float> Returner;
-   // ThePC->ClientMessage("Deque:");
-    //ThePC->ClientMessage(FString::FromInt(Dataqueue.size()));
+    
+    //Dynamically resize receive buffer and fill it
     if(ListenerSocket->HasPendingData(dataSize)){
         ThePC->ClientMessage("Socket:");
         ThePC->ClientMessage(FString::FromInt(dataSize));
@@ -127,25 +126,23 @@ TArray<float> PortReader::GetLine()
         int32 read;
         ListenerSocket->Recv(data.GetData(), data.Num(), read, ESocketReceiveFlags::None);
         out = StringFromBinaryArray(data);
+        //Log data for debugging
         ThePC->ClientMessage(out);
         
         
-//    TArray<FString> arr = ParsePort();
-//    if (arr.Num() < 1){Returner.Init(0,5); return Returner;}
-//    FString out = arr[arr.Num() - 1];
-    //ThePC->ClientMessage("Out:");
-    //ThePC->ClientMessage(out);
     TArray<FString> OutArray;
     out.ParseIntoArray(OutArray, TEXT(","), true);
     for (auto& Str : OutArray)
-    {
+    {   
+        //Convert to float
         Returner.Add(FCString::Atof(*Str));
     }
-    ThePC->ClientMessage("Using Default");
+    //Ensure we always have data to send.
     lastdata = Returner;
     return Returner;
     } else {
-       return lastdata;
+        ThePC->ClientMessage("Using Default");
+        return lastdata;
     }
     
     
@@ -153,10 +150,6 @@ TArray<float> PortReader::GetLine()
 
 FString PortReader::StringFromBinaryArray(TArray<uint8> BinaryArray)
 {
-	BinaryArray.Add(0); // Add 0 termination. Even if the string is already 0-terminated, it doesn't change the results.
-	// Create a string from a byte array. The string is expected to be 0 terminated (i.e. a byte set to 0).
-	// Use UTF8_TO_TCHAR if needed.
-	// If you happen to know the data is UTF-16 (USC2) formatted, you do not need any conversion to begin with.
-	// Otherwise you might have to write your own conversion algorithm to convert between multilingual UTF-16 planes.
+	BinaryArray.Add(0); 
 	return FString(ANSI_TO_TCHAR(reinterpret_cast<const char*>(BinaryArray.GetData())));
 }

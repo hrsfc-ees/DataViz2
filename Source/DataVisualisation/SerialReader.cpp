@@ -58,13 +58,12 @@ uint32 USerialReader::Run()
 	return 0;
 }
 
+//recieve and parse line from the serial port
 TArray<float> USerialReader::GetLine()
 {
     std::string s;
     std::getline(*ArduinoInput, s);
     FString out(s.c_str());
-//    ThePC->ClientMessage(out);
-//    ThePC->ClientMessage("Sent String Your Way :)");
     TArray<FString> OutArray;
     out.ParseIntoArray(OutArray, TEXT(","), true);
     FString ToPrint;
@@ -90,6 +89,8 @@ void USerialReader::EnsureCompletion()
 	Thread->WaitForCompletion();
 }
 
+
+
 USerialReader* USerialReader::EasyInit(std::ifstream* ArduinoInput, TQueue<TArray<float> >& TheQueue, APlayerController* InPC)
 {
     //Create new instance of thread if it does not exist
@@ -101,6 +102,7 @@ USerialReader* USerialReader::EasyInit(std::ifstream* ArduinoInput, TQueue<TArra
 	return Runnable;
 }
 
+//Shut down
 void USerialReader::Shutdown()
 {
     if (Runnable)

@@ -44,16 +44,23 @@ public:
     
     FSocket* ListenerSocket;
 public:
-
+    
+    //Get float from socket
     TArray<float> GetLine();
+    
+    //Convert uint8 array to Fstring
     FString StringFromBinaryArray(TArray<uint8> BinaryArray);
+    
 	virtual bool Init();
+    
 	virtual uint32 Run();
+    
 	virtual void Stop();
 	// End FRunnable interface
-//	TArray<FString> ParsePort();
 	/** Makes sure this thread has stopped properly */
 	void EnsureCompletion();
+    
+    //The previous good data
     TArray<float> lastdata;
 	
 	

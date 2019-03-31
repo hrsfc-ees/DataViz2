@@ -33,16 +33,13 @@ public:
     void ZoomIn();
     void ZoomOut();
     
-//    std::ifstream *ArduinoInput = nullptr;
-    
-//    std::string Voltage;
     
     // Begin Play Override
     virtual void BeginPlay() override;
     
     virtual void EndPlay(const EEndPlayReason::Type Reason) override;
     
-        // A queue that is accessesd by USerialReader to enable multithreading
+    // A queue that is accessesd by USerialReader to enable multithreading
     TQueue<TArray<float>> VoltageQueue;
     
     PortReader* ReaderInst = nullptr;

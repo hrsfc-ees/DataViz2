@@ -28,7 +28,6 @@ AHandPawn::AHandPawn()
     if (HandMesh.Succeeded())
     {
         MeshComponent->SetStaticMesh(HandMesh.Object);
-//        MeshComponent->SetRelativeLocation(FVector(200.0f, 0.0f, 0.0f));
         MeshComponent->SetWorldScale3D(FVector(10.0f));
     }
     //Set up pointer to Dynamic Material Instance
@@ -99,7 +98,8 @@ void AHandPawn::ZoomIn()
 {
         SpringArm->TargetArmLength += -10.0f;
 }
-
+\
+//Add material to hand if it doesn't exist already
 void AHandPawn::OnConstruction(const FTransform& Transform)
 {
     if (!FTCInstance_M){
@@ -110,6 +110,7 @@ void AHandPawn::OnConstruction(const FTransform& Transform)
 
 }
 
+//Clear up after ourselves
 void AHandPawn::EndPlay(const EEndPlayReason::Type Reason)
 {
     ReaderInst->Shutdown();
@@ -117,6 +118,8 @@ void AHandPawn::EndPlay(const EEndPlayReason::Type Reason)
     Super::EndPlay(Reason);
 }
 
+
+//Get voltage from the other thread which is reading the socket
 bool AHandPawn::GetVoltage(TArray<float>& VoltageArray)
 {
     if(!VoltageQueue.IsEmpty()){
@@ -125,17 +128,16 @@ bool AHandPawn::GetVoltage(TArray<float>& VoltageArray)
         VoltageQueue.Empty();
         UE_LOG(LogTemp, Warning, TEXT("Size of array is: %i"), VoltageArray.Num())
         if(VoltageArray.Num() > 1){
-//            UE_LOG(LogTemp, Warning, TEXT("Everything A-OK"))
             return true;
         } else {
-//            UE_LOG(LogTemp, Warning, TEXT("Array not 2 numbers long :("))
             return false;
         }
     } else {
-//        UE_LOG(LogTemp, Warning, TEXT("No Array Returned"))
         return false;
     }
 }
+
+//Reset queue in case it is too full
 void AHandPawn::ClearQueue()
 {
     VoltageQueue.Empty();
