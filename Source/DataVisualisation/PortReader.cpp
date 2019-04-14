@@ -14,7 +14,7 @@ PortReader::PortReader(TQueue<TArray<float> >& TheQueue, APlayerController* InPC
 :Queue(&TheQueue), ThePC(InPC), StopTaskCounter(0), ip(ip), port(port)
 {
     Thread = FRunnableThread::Create(this, TEXT("PortReader"), 0, TPri_Highest);
-    lastdata.Init(0,6);
+    lastdata.Init(0.75,6);
 }
 
 PortReader::~PortReader()

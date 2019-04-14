@@ -24,11 +24,10 @@ AHandPawn::AHandPawn()
     Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
     MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Hand Mesh"));
     MeshComponent->SetupAttachment(RootComponent);
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> HandMesh(TEXT("StaticMesh'/Game/ThirdPersonCPP/Blueprints/EESHands.EESHands'"));
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> HandMesh(TEXT("StaticMesh'/Game/HandPawn/Hands2.Hands2'"));
     if (HandMesh.Succeeded())
     {
         MeshComponent->SetStaticMesh(HandMesh.Object);
-        MeshComponent->SetWorldScale3D(FVector(10.0f));
     }
     //Set up pointer to Dynamic Material Instance
      static ConstructorHelpers::FObjectFinder<UMaterial> Material(TEXT("Material'/Game/Materials/MForceToColour.MForceToColour'"));
